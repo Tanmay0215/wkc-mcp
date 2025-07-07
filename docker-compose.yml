@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  wkc-mcp-server:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - FIREBASE_SERVICE_ACCOUNT_KEY_PATH=/app/firebase-service-account.json
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
+      - DEBUG=${DEBUG:-False}
+      - HOST=0.0.0.0
+      - PORT=8000
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000,https://wkc.vercel.app}
+    volumes:
+      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+  # Optional: Add MongoDB if you want to use it alongside Firebase
+  # mongodb:
+  #   image: mongo:5.0
+  #   ports:
+  #     - "27017:27017"
+  #   environment:
+  #     - MONGO_INITDB_ROOT_USERNAME=admin
+  #     - MONGO_INITDB_ROOT_PASSWORD=password
+  #   volumes:
+  #     - mongodb_data:/data/db
+  #   restart: unless-stopped
+
+  # volumes:
+  #   mongodb_data: 
